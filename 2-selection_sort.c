@@ -1,44 +1,60 @@
 #include "sort.h"
-#include <stdio.h>
 
 /**
- * selection_sort - sorts an array of integers in ascending order
- * using the Selection sort algorithm
- * @array: An array of integers
- * @size: size of the array
+ * swap - swaps 2 values
+ * @a: the first int
+ * @b: the seconde int
+ * Reuturn: void
+*/
+void swap(int *a, int *b)
+{
+	int temp;
+
+	temp = *a;
+	*a = *b;
+	*b = temp;
+}
+/**
+ * get_min_index - gets the minimum index for a sub array
+ * @array: the array to sort
+ * @start: the starting index of the sub array
+ * @size: the size of the array
+ * Return: min_index
+*/
+size_t get_min_index(int *array, int start, size_t size)
+{
+	size_t i, min_index;
+	int min_value;
+
+	min_value = array[start];
+	min_index = start;
+	for (i = start + 1; i < size; i++)
+	{
+		if (array[i] < min_value)
+		{
+			min_value = array[i];
+			min_index = i;
+		}
+	}
+	return (min_index);
+}
+/**
+ * selection_sort - sorts an array using selection sort algorithm
+ * @array: the array to sort
+ * @size: the size of the array
+ * Return: void
 */
 void selection_sort(int *array, size_t size)
 {
+	size_t i, min_index;
 
-size_t i, j, jMin;
-
-for (i = 0; i <= size; i++)
-{
-	jMin = i; /*consider the first element as min*/
-	for (j = i + 1; j < size; j++)
+	for (i = 0; i < size; i++)
 	{
-		if (array[j] < array[jMin])
-			jMin = j;
+		min_index = get_min_index(array, i, size);
+		if (i != min_index)
+		{
+			swap(&array[i], &array[min_index]);
+			print_array(array, size);
+		}
 	}
-	if (jMin != i)
-	{
-		swap_int(array, i, jMin);
-		print_array(array, size);
-	}
-}
-
-}
-
-/**
- * swap_int - Swap two integers in an array
- * @array: array to use
- * @a: first integer
- * @b: second integer
-*/
-void swap_int(int *array, size_t a, size_t b)
-{
-int tmp;
-tmp = array[a];
-array[a] = array[b];
-array[b] = tmp;
 }

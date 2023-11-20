@@ -1,55 +1,54 @@
 #include "sort.h"
 
-int get_max(int *array, int size);
-void radix_counting_sort(int *array, size_t size, int sig, int *buff);
-void radix_sort(int *array, size_t size);
 
 /**
- * get_max - gets the max num in an array
- * @array: the array to search in
- * @size: The size of the array
- *
- * Return: The maximum integer in the array.
- */
-int get_max(int *array, int size)
-{
-	int max, i;
-
-	for (max = array[0], i = 1; i < size; i++)
-	{
-		if (array[i] > max)
-			max = array[i];
-	}
-
-	return (max);
-}
-
-/**
- * radix_counting_sort - sorts digit based on position value according to count sort
- * @array: the array to sort
+ * get_max - gets the max value in an array
+ * @array: array of integers
  * @size: the size of the array
- * @sig: the significant digit to sort on
- * @buff: buffer to store the sorted array
- */
-void radix_counting_sort(int *array, size_t size, int sig, int *buff)
+ * Return: the max array
+*/
+int get_max(int *array, size_t size)
 {
-	int count[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	int num = 0;
 	size_t i;
 
 	for (i = 0; i < size; i++)
-		count[(array[i] / sig) % 10] += 1;
-
-	for (i = 0; i < 10; i++)
-		count[i] += count[i - 1];
-
-	for (i = size - 1; (int)i >= 0; i--)
 	{
-		buff[count[(array[i] / sig) % 10] - 1] = array[i];
-		count[(array[i] / sig) % 10] -= 1;
+		if (array[i] > num)
+			num = array[i];
 	}
+	return  (num);
+}
 
+/**
+ * count_sort - sorts digit based on position value according to count sort
+ * @array: the array to sort
+ * @size: the size of the array
+ * @pos: the postion to consider (units, tens, hunderds, ...etc)
+ * Return: void
+*/
+void count_sort(int *array, size_t size, int pos)
+{
+	int count[10] = {0}, *temp_arr;
+	size_t i;
+
+	temp_arr = malloc(size * sizeof(int));
+	if (temp_arr == NULL)
+		return;
 	for (i = 0; i < size; i++)
-		array[i] = buff[i];
+		count[(array[i] / pos) % 10]++;
+	for (i = 1; i < 10; i++)
+		count[i] += count[i - 1];
+	for (i = size - 1; ; i--)
+	{
+		temp_arr[--count[(array[i] / pos) % 10]] = array[i];
+		if (i == 0)
+			break;
+		/* doing it like that because size_t types cannot be -ve */
+	}
+	for (i = 0; i < size; i++)
+		array[i] = temp_arr[i];
+	free(temp_arr);
 }
 
 /**
@@ -60,21 +59,14 @@ void radix_counting_sort(int *array, size_t size, int sig, int *buff)
 */
 void radix_sort(int *array, size_t size)
 {
-	int max, sig, *buff;
+	int pos, max_num;
 
-	if (array == NULL || size < 2)
+	if (size == 0)
 		return;
-
-	buff = malloc(sizeof(int) * size);
-	if (buff == NULL)
-		return;
-
-	max = get_max(array, size);
-	for (sig = 1; max / sig > 0; sig *= 10)
+	max_num = get_max(array, size);
+	for (pos = 1; max_num / pos > 0; pos *= 10)
 	{
-		radix_counting_sort(array, size, sig, buff);
+		count_sort(array, size, pos);
 		print_array(array, size);
 	}
-
-	free(buff);
 }
